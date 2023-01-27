@@ -29,10 +29,7 @@ func RBACPathMiddleware(model, policy, tokenHeader string) func(c *gin.Context) 
 		for _, reqToken := range c.Request.Header[tokenHeader] {
 			allowed, err = e.Enforce(reqToken, path, method)
 			if err != nil {
-				c.JSON(
-					http.StatusForbidden,
-					gin.H{"error": err.Error()},
-				)
+				ReturnData(c, http.StatusForbidden, gin.H{"error": err.Error()})
 				c.Abort()
 				return
 			}
@@ -42,10 +39,7 @@ func RBACPathMiddleware(model, policy, tokenHeader string) func(c *gin.Context) 
 		}
 
 		if !allowed {
-			c.JSON(
-				http.StatusForbidden,
-				gin.H{"error": "must provide a valid token"},
-			)
+			ReturnData(c, http.StatusForbidden, gin.H{"error": "RBAC did not allow authorization"})
 			c.Abort()
 			return
 		}
@@ -80,10 +74,7 @@ func RBACParamMiddleware(model, policy, tokenHeader string, params []string) fun
 			}
 			allowed, err = e.Enforce(args...)
 			if err != nil {
-				c.JSON(
-					http.StatusForbidden,
-					gin.H{"error": err.Error()},
-				)
+				ReturnData(c, http.StatusForbidden, gin.H{"error": err.Error()})
 				c.Abort()
 				return
 			}
@@ -93,10 +84,7 @@ func RBACParamMiddleware(model, policy, tokenHeader string, params []string) fun
 		}
 
 		if !allowed {
-			c.JSON(
-				http.StatusForbidden,
-				gin.H{"error": "must provide a valid token"},
-			)
+			ReturnData(c, http.StatusForbidden, gin.H{"error": "RBAC did not allow authorization"})
 			c.Abort()
 			return
 		}

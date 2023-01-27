@@ -6,14 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (e *Engine) TokenAuthGroup(path, token, header string) *gin.RouterGroup {
+func (e *Engine) SimpleTokenAuthGroup(path, token, header string) *gin.RouterGroup {
 	restricted := e.Router().Group(path)
-	restricted.Use(AuthenticatedMiddleware(token, header))
+	restricted.Use(SimpleTokenAuthMiddleware(token, header))
 
 	return restricted
 }
 
-func AuthenticatedMiddleware(token, header string) func(c *gin.Context) {
+func SimpleTokenAuthMiddleware(token, header string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		Authenticated := false
 		if token == "" {

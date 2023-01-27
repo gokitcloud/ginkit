@@ -10,7 +10,7 @@ import (
 func main() {
 	e := ginkit.NewDefault()
 
-	restricted := e.TokenAuthGroup("/", "12345678", "X-Token")
+	restricted := e.SimpleTokenAuthGroup("/", "12345678", "X-Token")
 	restricted.GET("/test", ginkit.WrapDataFunc(test))
 	restricted.GET("/test/:id/*path", ginkit.WrapDataFuncParams(test2))
 
