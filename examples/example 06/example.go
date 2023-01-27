@@ -16,8 +16,10 @@ func main() {
 	restricted.GET("/test", ginkit.WrapDataFunc(test))
 
 	restricted2 := e.RBACGroup("/org/:id", "org_model.conf", "org_policy.csv", "header:X-Token", "param:id")
+	restricted2.Use(ginkit.RemoveHeaders("X-Token"))
 	restricted2.GET("", ginkit.WrapDataFuncParams(test2))
 	restricted2.GET("/", ginkit.WrapDataFuncParams(test2))
+	restricted2.GET("/proxy/*proxyPath", ginkit.Proxy("https://httpbin.org/"))
 
 	err := e.Run(":3333")
 	if err != nil {
