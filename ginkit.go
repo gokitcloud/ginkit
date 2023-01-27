@@ -16,6 +16,7 @@ type (
 		router          *gin.Engine
 		version         string
 		templateFuncMap templateHTML.FuncMap
+		healthChecks    []func() error
 	}
 )
 
@@ -52,6 +53,7 @@ func New() *Engine {
 	e := &Engine{
 		router:          r,
 		templateFuncMap: make(templateHTML.FuncMap),
+		healthChecks:    make([]func() error, 0),
 	}
 
 	// Copy base Template Functions
@@ -82,5 +84,24 @@ func (e *Engine) versionRoute(c *gin.Context) {
 }
 
 func (e *Engine) health(c *gin.Context) {
-	ReturnData(c, http.StatusOK, gin.H{"status": "ok"})
+	errs := []string{}
+
+	for _, f := range e.healthChecks {
+		err := f()
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+	}
+
+	if len(errs) == 0 {
+		ReturnData(c, http.StatusOK, gin.H{"status": "ok"})
+	} else {
+		ReturnData(c, http.StatusInternalServerError, gin.H{"status": "error", "errors": errs})
+	}
+}
+
+func (e *Engine) AddHealthCheckFunc(f func() error) *Engine {
+	e.healthChecks = append(e.healthChecks, f)
+
+	return e
 }

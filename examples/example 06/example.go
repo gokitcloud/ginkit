@@ -1,13 +1,16 @@
 package main
 
 import (
+	"errors"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/gokitcloud/ginkit"
 )
 
 func main() {
-	e := ginkit.NewDefault().SetVersion("0.0.0")
+	e := ginkit.NewDefault().SetVersion("0.0.0").AddHealthCheckFunc(MyInternalHealthCheck)
 
 	restricted := e.RBACTokenPathGroup("/", "path_model.conf", "path_policy.csv", "X-Token")
 	restricted.GET("/test", ginkit.WrapDataFunc(test))
@@ -34,4 +37,12 @@ func test2(p ginkit.Params) (any, error) {
 		"orgid":  id,
 		"params": p,
 	}, nil
+}
+
+func MyInternalHealthCheck() error {
+	rand.Seed(time.Now().UnixNano())
+	if rand.Intn(2) == 1 {
+		return errors.New("Random error")
+	}
+	return nil
 }
