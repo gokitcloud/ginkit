@@ -9,10 +9,10 @@ import (
 func main() {
 	e := ginkit.NewDefault().SetVersion("0.0.0")
 
-	restricted := e.RBACPathGroup("/", "path_model.conf", "path_policy.csv", "X-Token")
+	restricted := e.RBACTokenPathGroup("/", "path_model.conf", "path_policy.csv", "X-Token")
 	restricted.GET("/test", ginkit.WrapDataFunc(test))
 
-	restricted2 := e.RBACParamGroup("/org/:id", "org_model.conf", "org_policy.csv", "X-Token", []string{"id"})
+	restricted2 := e.RBACTokenParamGroup("/org/:id", "org_model.conf", "org_policy.csv", "X-Token", []string{"id"})
 	restricted2.GET("", ginkit.WrapDataFunc(test))
 	restricted2.GET("/", ginkit.WrapDataFunc(test))
 

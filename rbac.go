@@ -8,14 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (e *Engine) RBACPathGroup(path, model, policy, tokenHeader string) *gin.RouterGroup {
+func (e *Engine) RBACTokenPathGroup(path string, model, policy any, tokenHeader string) *gin.RouterGroup {
 	restricted := e.Router().Group(path)
-	restricted.Use(RBACPathMiddleware(model, policy, tokenHeader))
+	restricted.Use(RBACTokenPathMiddleware(model, policy, tokenHeader))
 
 	return restricted
 }
 
-func RBACPathMiddleware(model, policy, tokenHeader string) func(c *gin.Context) {
+func RBACTokenPathMiddleware(model, policy any, tokenHeader string) func(c *gin.Context) {
 	e, err := casbin.NewEnforcer(model, policy)
 	if err != nil {
 		log.Fatal(err)
@@ -46,14 +46,14 @@ func RBACPathMiddleware(model, policy, tokenHeader string) func(c *gin.Context) 
 	}
 }
 
-func (e *Engine) RBACParamGroup(path, model, policy, tokenHeader string, params []string) *gin.RouterGroup {
+func (e *Engine) RBACTokenParamGroup(path string, model, policy any, tokenHeader string, params []string) *gin.RouterGroup {
 	restricted := e.Router().Group(path)
-	restricted.Use(RBACParamMiddleware(model, policy, tokenHeader, params))
+	restricted.Use(RBACTokenParamMiddleware(model, policy, tokenHeader, params))
 
 	return restricted
 }
 
-func RBACParamMiddleware(model, policy, tokenHeader string, params []string) func(c *gin.Context) {
+func RBACTokenParamMiddleware(model, policy any, tokenHeader string, params []string) func(c *gin.Context) {
 	e, err := casbin.NewEnforcer(model, policy)
 	if err != nil {
 		log.Fatal(err)
