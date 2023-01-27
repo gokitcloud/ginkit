@@ -43,7 +43,7 @@ func New() *Engine {
 	// Use default logger
 	r.Use(gin.Logger())
 
-	// Cors Config
+	// Cors Config - TODO Make CORS Configurarable
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowAllOrigins = true
 	corsConfig.AllowHeaders = []string{"Origin"}
@@ -66,10 +66,10 @@ func (e *Engine) Router() *gin.Engine {
 	return e.router
 }
 
-func (e *Engine) SetVersion(version string) *gin.Engine {
+func (e *Engine) SetVersion(version string) *Engine {
 	e.version = version
 
-	return e.router
+	return e
 }
 
 func (e *Engine) versionRoute(c *gin.Context) {
@@ -82,8 +82,5 @@ func (e *Engine) versionRoute(c *gin.Context) {
 }
 
 func (e *Engine) health(c *gin.Context) {
-	c.JSON(
-		http.StatusOK,
-		nil,
-	)
+	ReturnData(c, http.StatusOK, gin.H{"status": "ok"})
 }

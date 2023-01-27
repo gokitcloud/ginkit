@@ -78,7 +78,6 @@ func RBACParamMiddleware(model, policy, tokenHeader string, params []string) fun
 			for _, v := range paramValues {
 				args = append(args, v)
 			}
-			log.Println(args)
 			allowed, err = e.Enforce(args...)
 			if err != nil {
 				c.JSON(

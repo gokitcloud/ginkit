@@ -1,14 +1,13 @@
 package main
 
 import (
-	"errors"
 	"log"
 
 	"github.com/gokitcloud/ginkit"
 )
 
 func main() {
-	e := ginkit.NewDefault()
+	e := ginkit.NewDefault().SetVersion("0.0.0")
 
 	restricted := e.RBACPathGroup("/", "path_model.conf", "path_policy.csv", "X-Token")
 	restricted.GET("/test", ginkit.WrapDataFunc(test))
@@ -28,11 +27,11 @@ func test() (any, error) {
 }
 
 func test2(p ginkit.Params) (any, error) {
-	if id, _ := p.Get("id"); id != "123" {
-		return nil, errors.New("invalid id")
-	}
+	id, _ := p.Get("id")
+
 	return map[string]any{
 		"foo":    "bar",
+		"orgid":  id,
 		"params": p,
 	}, nil
 }
