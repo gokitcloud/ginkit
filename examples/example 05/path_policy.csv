@@ -1,0 +1,6 @@
+p, test_user, /test, GET
+p, test_user, /test/*, GET
+p, test_admin, /test, *
+p, test_admin, /test/*, *
+g, 1234, test_user
+g, 12345678, test_admin
