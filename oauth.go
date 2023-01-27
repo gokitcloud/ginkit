@@ -21,12 +21,14 @@ func (e *Engine) OAuthGroup(path string, authServerURL string, config oauth2.Con
 	}
 	noauth := e.Router().Group("/")
 	noauth.GET("/oauth2", oauthEndpoint(config))
+	noauth.GET("/logout", LogoutRoute)
 
 	authorized := e.Router().Group(path)
 	authorized.Use(oauthMiddleware(authServerURL, config))
 
 	return authorized
 }
+
 
 func genCodeChallengeS256(s string) string {
 	s256 := sha256.Sum256([]byte(s))

@@ -12,7 +12,7 @@ import (
 
 var (
 	authServerURL = "http://localhost:9096"
-	oauthConfig = oauth2.Config{
+	oauthConfig   = oauth2.Config{
 		ClientID:     "222222",
 		ClientSecret: "22222222",
 		Scopes:       []string{"all"},
@@ -30,6 +30,7 @@ func main() {
 	restricted := e.OAuthGroup("/org/:id", authServerURL, oauthConfig)
 	restricted.Use(ginkit.RBACMiddleware("org_model.conf", "org_policy.csv", "session:oauth_user_id", "param:id"))
 	restricted.Use(ginkit.RemoveHeaders("X-Token"))
+	restricted.Use(ginkit.RemoveHeaders("Cookie"))
 	restricted.GET("", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/proxy/*proxyPath", ginkit.Proxy("https://httpbin.org/"))
