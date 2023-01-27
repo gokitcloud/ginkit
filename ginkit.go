@@ -8,6 +8,9 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/location"
 	"github.com/gin-contrib/requestid"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +20,7 @@ type (
 		version         string
 		templateFuncMap templateHTML.FuncMap
 		healthChecks    []func() error
+		sessionsEnabled bool
 	}
 )
 
@@ -26,8 +30,35 @@ func NewDefault() (r *Engine) {
 	e.Static("./web/assets")
 	e.Templates("web/views", nil)
 
-	e.Router().GET("/health", e.health)
-	e.Router().GET("/ruok", e.health)
+	e.Router().GET("/health", e.HealthCheckRoute)
+	e.Router().GET("/ruok", e.HealthCheckRoute)
+	e.Router().GET("/version", e.versionRoute)
+
+	return e
+}
+
+func NewDefaultWithSessions(sessionType, name, secret string) (r *Engine) {
+	e := New()
+
+	switch sessionType {
+	case "cookie":
+		store := cookie.NewStore([]byte(secret))
+		e.Router().Use(sessions.Sessions(name, store))
+	case "memstore":
+		store := memstore.NewStore([]byte(secret))
+		e.Router().Use(sessions.Sessions(name, store))
+	default:
+		store := memstore.NewStore([]byte(secret))
+		e.Router().Use(sessions.Sessions(name, store))
+	}
+
+	e.sessionsEnabled = true
+
+	e.Static("./web/assets")
+	e.Templates("web/views", nil)
+
+	e.Router().GET("/health", e.HealthCheckRoute)
+	e.Router().GET("/ruok", e.HealthCheckRoute)
 	e.Router().GET("/version", e.versionRoute)
 
 	return e
@@ -83,7 +114,7 @@ func (e *Engine) versionRoute(c *gin.Context) {
 	)
 }
 
-func (e *Engine) health(c *gin.Context) {
+func (e *Engine) HealthCheckRoute(c *gin.Context) {
 	errs := []string{}
 
 	for _, f := range e.healthChecks {

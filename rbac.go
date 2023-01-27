@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/v2"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -136,6 +137,8 @@ func RBACMiddleware(model, policy any, params ...any) func(c *gin.Context) {
 				case "header":
 					paramValue = c.Request.Header.Get(param[1])
 				case "session":
+					session := sessions.Default(c)
+					paramValue = session.Get(param[1])
 				}
 			case func(c *gin.Context) any:
 				paramValue = p.(func(c *gin.Context) any)(c)
