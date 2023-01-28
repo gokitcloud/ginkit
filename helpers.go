@@ -10,9 +10,9 @@ import (
 
 func parseContext(p any, c *gin.Context) any {
 	var paramValue any
-	switch p.(type) {
+	switch p := p.(type) {
 	case string:
-		param := strings.Split(p.(string), ":")
+		param := strings.Split(p, ":")
 		if len(param) < 2 {
 			ReturnData(c, http.StatusForbidden, gin.H{"error": "invalid RBAC config"})
 			c.Abort()
@@ -40,7 +40,7 @@ func parseContext(p any, c *gin.Context) any {
 			paramValue = session.Get(param[1])
 		}
 	case func(c *gin.Context) any:
-		paramValue = p.(func(c *gin.Context) any)(c)
+		paramValue = p(c)
 	}
 
 	return paramValue
