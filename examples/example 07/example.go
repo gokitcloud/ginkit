@@ -27,6 +27,8 @@ var (
 func main() {
 	e := ginkit.NewDefaultWithSessions("memstore", "example07", "123456578").SetVersion("0.0.0").AddHealthCheckFunc(MyInternalHealthCheck)
 
+	e.Router().Use(ginkit.MetricsMiddleware("test", "session:oauth_user_id", "param:id", "request:method"))
+	
 	restricted := e.OAuthGroup("/org/:id", authServerURL, oauthConfig)
 	restricted.Use(ginkit.RBACMiddleware("org_model.conf", "org_policy.csv", "session:oauth_user_id", "param:id"))
 	restricted.Use(ginkit.RemoveHeaders("X-Token"))

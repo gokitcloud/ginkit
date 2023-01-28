@@ -41,6 +41,7 @@ func oauthMiddleware(authServerURL string, config oauth2.Config) gin.HandlerFunc
 		session := sessions.Default(c)
 
 		if session.Get("token") == nil {
+			// TODO: Param for s256example
 			u := config.AuthCodeURL(c.Request.URL.Path,
 				oauth2.SetAuthURLParam("code_challenge", genCodeChallengeS256("s256example")),
 				oauth2.SetAuthURLParam("code_challenge_method", "S256"))
