@@ -29,6 +29,8 @@ func parseContext(p any, c *gin.Context) any {
 			}
 		case "value":
 			paramValue = param[1]
+		case "context":
+			paramValue, _ = c.Get(param[1])
 		case "param":
 			paramValue = c.Param(param[1])
 		case "header":

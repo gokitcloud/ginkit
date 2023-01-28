@@ -26,10 +26,7 @@ func SimpleTokenAuthMiddleware(token, header string) func(c *gin.Context) {
 		}
 
 		if !Authenticated {
-			c.JSON(
-				http.StatusForbidden,
-				gin.H{"error": "must provide a valid token"},
-			)
+			ReturnData(c, http.StatusForbidden, gin.H{"error": "must provide a valid token"})
 			c.Abort()
 			return
 		}

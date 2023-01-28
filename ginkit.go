@@ -106,12 +106,7 @@ func (e *Engine) SetVersion(version string) *Engine {
 }
 
 func (e *Engine) versionRoute(c *gin.Context) {
-	c.JSON(
-		http.StatusOK,
-		gin.H{
-			"version": e.version,
-		},
-	)
+	ReturnData(c, http.StatusOK, gin.H{"version": e.version})
 }
 
 func (e *Engine) HealthCheckRoute(c *gin.Context) {

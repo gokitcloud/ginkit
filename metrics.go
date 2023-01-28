@@ -15,6 +15,6 @@ func MetricsMiddleware(metric string, keys ...any) func(c *gin.Context) {
 			metricValues[fmt.Sprint(p)] = metricValue
 		}
 
-		fmt.Println("# Metrics: ", metric, metricValues)
+		// fmt.Println("# Metrics: ", metric, metricValues)
 	}
 }

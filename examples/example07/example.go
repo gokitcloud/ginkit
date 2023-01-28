@@ -16,7 +16,7 @@ var (
 		ClientID:     "222222",
 		ClientSecret: "22222222",
 		Scopes:       []string{"all"},
-		RedirectURL:  "http://localhost:3333/oauth2",
+		RedirectURL:  "http://devlocal.site:3333/oauth2",
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  authServerURL + "/oauth/authorize",
 			TokenURL: authServerURL + "/oauth/token",
@@ -28,11 +28,10 @@ func main() {
 	e := ginkit.NewDefaultWithSessions("memstore", "example07", "123456578").SetVersion("0.0.0").AddHealthCheckFunc(MyInternalHealthCheck)
 
 	e.Router().Use(ginkit.MetricsMiddleware("test", "session:oauth_user_id", "param:id", "request:method"))
-	
+
 	restricted := e.OAuthGroup("/org/:id", authServerURL, oauthConfig)
 	restricted.Use(ginkit.RBACMiddleware("org_model.conf", "org_policy.csv", "session:oauth_user_id", "param:id"))
-	restricted.Use(ginkit.RemoveHeaders("X-Token"))
-	restricted.Use(ginkit.RemoveHeaders("Cookie"))
+	restricted.Use(ginkit.RemoveHeaders("X-Token", "Cookie"))
 	restricted.GET("", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/proxy/*proxyPath", ginkit.Proxy("https://httpbin.org/"))
