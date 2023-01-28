@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -29,7 +29,6 @@ func (e *Engine) OAuthGroup(path string, authServerURL string, config oauth2.Con
 	return authorized
 }
 
-
 func genCodeChallengeS256(s string) string {
 	s256 := sha256.Sum256([]byte(s))
 	return base64.URLEncoding.EncodeToString(s256[:])
@@ -48,7 +47,14 @@ func oauthMiddleware(authServerURL string, config oauth2.Config) gin.HandlerFunc
 
 			c.Redirect(http.StatusFound, u)
 			c.Abort()
-			session.Save()
+			err := session.Save()
+			if err != nil {
+				// TODO: replace with errorFunc
+				c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+				c.Abort()
+				return
+			}
+
 			return
 		}
 
@@ -66,7 +72,7 @@ func oauthMiddleware(authServerURL string, config oauth2.Config) gin.HandlerFunc
 
 			// TODO: was return a 200?
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				// TODO: replace with errorFunc
 				log.Println(err)
@@ -87,7 +93,14 @@ func oauthMiddleware(authServerURL string, config oauth2.Config) gin.HandlerFunc
 
 				c.Redirect(http.StatusFound, u)
 				c.Abort()
-				session.Save()
+				err := session.Save()
+				if err != nil {
+					// TODO: replace with errorFunc
+					c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+					c.Abort()
+					return
+				}
+
 				return
 			}
 
@@ -97,7 +110,13 @@ func oauthMiddleware(authServerURL string, config oauth2.Config) gin.HandlerFunc
 
 			session.Set("polled", true)
 
-			session.Save()
+			err = session.Save()
+			if err != nil {
+				// TODO: replace with errorFunc
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				c.Abort()
+				return
+			}
 		}
 
 		c.Next()
@@ -109,7 +128,14 @@ func oauthEndpoint(config oauth2.Config) gin.HandlerFunc {
 
 		session := sessions.Default(c)
 
-		c.Request.ParseForm()
+		err := c.Request.ParseForm()
+		if err != nil {
+			// TODO: replace with errorFunc
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+
 		state := c.Request.Form.Get("state")
 		code := c.Request.Form.Get("code")
 		if code == "" {
@@ -122,7 +148,13 @@ func oauthEndpoint(config oauth2.Config) gin.HandlerFunc {
 			return
 		}
 		session.Set("token", token.AccessToken)
-		session.Save()
+		err = session.Save()
+		if err != nil {
+			// TODO: replace with errorFunc
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
 
 		if state == "" {
 			c.JSON(200, gin.H{"state": state, "token": token})

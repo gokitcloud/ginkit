@@ -65,7 +65,7 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Run Tests
-        run: make test
+        run: go test .
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
