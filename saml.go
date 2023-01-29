@@ -32,6 +32,15 @@ type (
 )
 
 func (e *Engine) SAMLGroup(path string, config *SAMLGroupConfig) *gin.RouterGroup {
+	samlSP := e.SAMLInit(config)
+	restricted := e.Router().Group(path)
+	restricted.Use(SAMLMiddleware(samlSP))
+	restricted.Use(SAMLtoParamsMapMiddleware(config.ParamMap))
+
+	return restricted
+}
+
+func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
 	// TODO: Move to builtin Cert Store
 	keyPair, err := tls.LoadX509KeyPair(config.CertFile, config.KeyFile)
 	if err != nil {
@@ -78,15 +87,12 @@ func (e *Engine) SAMLGroup(path string, config *SAMLGroupConfig) *gin.RouterGrou
 	})
 
 	// TODO Does this need to be any?
+	// TODO make /saml path configurable
 	// e.Router().Any("/saml/*action", gin.WrapH(samlSP))
 	e.Router().GET("/saml/*action", gin.WrapH(samlSP))
 	e.Router().POST("/saml/*action", gin.WrapH(samlSP))
 
-	restricted := e.Router().Group(path)
-	restricted.Use(SAMLMiddleware(samlSP))
-	restricted.Use(SAMLtoParamsMapMiddleware(config.ParamMap))
-
-	return restricted
+	return samlSP
 }
 
 func SAMLMiddleware(samlSP *samlsp.Middleware) func(c *gin.Context) {

@@ -39,6 +39,23 @@ func WrapDataFunc(f func() (any, error)) func(*gin.Context) {
 	}
 }
 
+func WrapErrorFunc(f func() error) func(*gin.Context) {
+	return func(c *gin.Context) {
+		status := http.StatusOK
+		var data any
+
+		err := f()
+		if err != nil {
+			status = http.StatusInternalServerError
+			data = gin.H{
+				"error": err.Error(),
+			}
+		}
+
+		ReturnData(c, status, data)
+	}
+}
+
 func WrapDataFuncParams(f func(Params) (any, error)) func(*gin.Context) {
 	return func(c *gin.Context) {
 		status := http.StatusOK
@@ -88,6 +105,8 @@ func (e *Engine) Handle(httpMethod, relativePath string, funcs ...any) {
 			handlers = append(handlers, WrapDataFuncParams(f))
 		case func() (any, error):
 			handlers = append(handlers, WrapDataFunc(f))
+		case func() error:
+			handlers = append(handlers, WrapErrorFunc(f))
 		default:
 			panic("Unknown function type")
 		}
