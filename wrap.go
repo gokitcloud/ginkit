@@ -97,10 +97,16 @@ func (e *Engine) Handle(httpMethod, relativePath string, funcs ...any) {
 
 	for _, f := range funcs {
 		switch f := f.(type) {
+		case gin.HandlersChain:
+			handlers = append(handlers, f...)
+		case gin.HandlerFunc:
+			handlers = append(handlers, f)
+		case http.HandlerFunc:
+			handlers = append(handlers, gin.WrapF(f))
+		case http.Handler:
+			handlers = append(handlers, gin.WrapH(f))
 		case func(*gin.Context) (any, error):
 			handlers = append(handlers, WrapDataFuncContext(f))
-		case func(*gin.Context):
-			handlers = append(handlers, f)
 		case func(Params) (any, error):
 			handlers = append(handlers, WrapDataFuncParams(f))
 		case func() (any, error):

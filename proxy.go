@@ -1,6 +1,7 @@
 package ginkit
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -13,6 +14,12 @@ func RemoveHeaders(headers ...string) func(*gin.Context) {
 		for _, header := range headers {
 			c.Request.Header.Del(header)
 		}
+	}
+}
+
+func AddRequestHeader(header, key string) func(*gin.Context) {
+	return func(c *gin.Context) {
+		c.Request.Header.Add(key, fmt.Sprintf("%v", parseContext(key, c)))
 	}
 }
 
