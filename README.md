@@ -44,7 +44,8 @@ $ go get -u github.com/gokitcloud/ginkit
 
 ### Running Ginkit
 
-First you need to import Ginkit package for using Gin, one simplest example likes the follow `examples/example01/example.go`:
+First you need to import Ginkit package for using Gin, and set up the simple example below:  
+_from [example01](examples/example01/example.go)_
 
 ```go
 package main
@@ -65,7 +66,8 @@ func main() {
 And use the Go command to run the demo:
 
 ```
-# run example.go and visit 0.0.0.0:8080/ping on browser
+# run example.go from the examples/example01 directory
+# and visit 0.0.0.0:8080/ping on browser
 $ go run example.go
 ```
 
