@@ -1,22 +1,14 @@
 package main
 
 import (
-	"log"
-
+	"github.com/gin-gonic/gin"
 	"github.com/gokitcloud/ginkit"
 )
 
 func main() {
-	e := ginkit.NewDefault()
-
-	e.GET("/test", test)
-
-	err := e.Run(":3333")
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func test() (any, error) {
-	return map[string]any{"foo": "bar"}, nil
+	r := ginkit.Default()
+	r.GET("/ping", gin.H{
+		"message": "pong",
+	})
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

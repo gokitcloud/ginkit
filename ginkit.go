@@ -24,6 +24,10 @@ type (
 	}
 )
 
+func Default() (r *Engine) {
+	return NewDefault()
+}
+
 func NewDefault() (r *Engine) {
 	e := New()
 
