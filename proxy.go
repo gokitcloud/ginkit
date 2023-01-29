@@ -23,6 +23,10 @@ func AddRequestHeader(header, key string) func(*gin.Context) {
 	}
 }
 
+func (e *Engine) NoRouteProxy(target string) {
+	e.Router().NoRoute(Proxy(target))
+}
+
 func Proxy(target string) func(*gin.Context) {
 	return func(c *gin.Context) {
 		remote, err := url.Parse(target)

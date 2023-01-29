@@ -92,7 +92,18 @@ func WrapDataFuncContext(f func(*gin.Context) (any, error)) func(*gin.Context) {
 	}
 }
 
+func (e *Engine) NoRoute(funcs ...any) {
+	handlers := e.wrapHanders(funcs...)
+
+	e.Router().NoRoute(handlers...)
+}
+
 func (e *Engine) Handle(httpMethod, relativePath string, funcs ...any) {
+	handlers := e.wrapHanders(funcs...)
+	e.Router().Handle(httpMethod, relativePath, handlers...)
+}
+
+func (e *Engine) wrapHanders(funcs ...any) []gin.HandlerFunc {
 	handlers := []gin.HandlerFunc{}
 
 	for _, f := range funcs {
@@ -118,33 +129,33 @@ func (e *Engine) Handle(httpMethod, relativePath string, funcs ...any) {
 		}
 	}
 
-	e.Router().Handle(httpMethod, relativePath, handlers...)
+	return handlers
 }
 
-func (e *Engine) GET(relativePath string, f any) {
-	e.Handle(http.MethodGet, relativePath, f)
+func (e *Engine) GET(relativePath string, f ...any) {
+	e.Handle(http.MethodGet, relativePath, f...)
 }
 
-func (e *Engine) POST(relativePath string, f any) {
-	e.Handle(http.MethodPost, relativePath, f)
+func (e *Engine) POST(relativePath string, f ...any) {
+	e.Handle(http.MethodPost, relativePath, f...)
 }
 
-func (e *Engine) PUT(relativePath string, f any) {
-	e.Handle(http.MethodPut, relativePath, f)
+func (e *Engine) PUT(relativePath string, f ...any) {
+	e.Handle(http.MethodPut, relativePath, f...)
 }
 
-func (e *Engine) HEAD(relativePath string, f any) {
-	e.Handle(http.MethodHead, relativePath, f)
+func (e *Engine) HEAD(relativePath string, f ...any) {
+	e.Handle(http.MethodHead, relativePath, f...)
 }
 
-func (e *Engine) PATCH(relativePath string, f any) {
-	e.Handle(http.MethodPatch, relativePath, f)
+func (e *Engine) PATCH(relativePath string, f ...any) {
+	e.Handle(http.MethodPatch, relativePath, f...)
 }
 
-func (e *Engine) DELETE(relativePath string, f any) {
-	e.Handle(http.MethodDelete, relativePath, f)
+func (e *Engine) DELETE(relativePath string, f ...any) {
+	e.Handle(http.MethodDelete, relativePath, f...)
 }
 
-func (e *Engine) OPTIONS(relativePath string, f any) {
-	e.Handle(http.MethodOptions, relativePath, f)
+func (e *Engine) OPTIONS(relativePath string, f ...any) {
+	e.Handle(http.MethodOptions, relativePath, f...)
 }
