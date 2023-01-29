@@ -22,6 +22,7 @@ type (
 		healthChecks    []func() error
 		sessionsEnabled bool
 	}
+	H map[string]any
 )
 
 func Default() (r *Engine) {
