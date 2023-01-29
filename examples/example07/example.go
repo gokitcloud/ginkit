@@ -26,7 +26,7 @@ var (
 		Model:  "org_model.conf",
 		Policy: "org_policy.csv",
 		Params: []any{
-			"session:oauth_user_id", 
+			"session:oauth_user_id",
 			"param:id",
 		},
 	}
