@@ -67,7 +67,49 @@ jobs:
           go mod download
           go test .
 
+  examples:
+    needs: lint
+    strategy:
+      matrix:
+        example: 
+          - example01
+          - example02
+          - example03
+          - example04
+        os: [ubuntu-latest, macos-latest]
+        go: [1.18, 1.19]
+        include:
+          - os: ubuntu-latest
+            go-build: ~/.cache/go-build
+          - os: macos-latest
+            go-build: ~/Library/Caches/go-build
+    name: ${{ matrix.os }} @ Go ${{ matrix.go }}
+    runs-on: ${{ matrix.os }}
+    env:
+      GO111MODULE: on
+      GOPROXY: https://proxy.golang.org
+    steps:
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ${{ matrix.go-build }}
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Run Examples
+        working-directory: examples/${{ matrix.example }}
         run: |
-          find ./examples/* -type d | xargs go test
+          go mod download
+          go test .

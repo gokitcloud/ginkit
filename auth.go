@@ -6,11 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (e *Engine) SimpleTokenAuthGroup(path, token, header string) *gin.RouterGroup {
+func (e *Engine) SimpleTokenAuthGroup(path, token, header string) *RouterGroup {
 	restricted := e.Router().Group(path)
-	restricted.Use(SimpleTokenAuthMiddleware(token, header))
-
-	return restricted
+	rg := RouterGroup{
+		*restricted,
+	}
+	rg.Use(SimpleTokenAuthMiddleware(token, header))
+	return &rg
 }
 
 func SimpleTokenAuthMiddleware(token, header string) func(c *gin.Context) {

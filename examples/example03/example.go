@@ -2,34 +2,23 @@ package main
 
 import (
 	"errors"
-	"log"
 
 	"github.com/gokitcloud/ginkit"
 )
 
 func main() {
-	e := ginkit.NewDefault()
 
-	restricted := e.SimpleTokenAuthGroup("/", "12345678", "X-Token")
-	restricted.GET("/test", ginkit.WrapDataFunc(test))
-	restricted.GET("/test/:id/*path", ginkit.WrapDataFuncParams(test2))
+	r := ginkit.Default()
+	restricted := r.SimpleTokenAuthGroup("/", "12345678", "X-Token")
+	restricted.GET("/:ping", func(p ginkit.Params) (any, error) {
+		if ping, ok := p.Get("ping"); ok && ping == "ping" {
+			return ginkit.H{
+				"message": "pong",
+			}, nil
+		}
 
-	err := e.Run(":3333")
-	if err != nil {
-		log.Println(err)
-	}
-}
+		return nil, errors.New("invalid ping")
+	})
 
-func test() (any, error) {
-	return map[string]any{"foo": "bar"}, nil
-}
-
-func test2(p ginkit.Params) (any, error) {
-	if id, _ := p.Get("id"); id != "123" {
-		return nil, errors.New("invalid id")
-	}
-	return map[string]any{
-		"foo":    "bar",
-		"params": p,
-	}, nil
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

@@ -42,9 +42,9 @@ Otherwise, run the following Go command to install the `gin` package:
 $ go get -u github.com/gokitcloud/ginkit
 ```
 
-### Running Gin
+### Running Ginkit
 
-First you need to import Gin package for using Gin, one simplest example likes the follow `examples/example01/example.go`:
+First you need to import Ginkit package for using Gin, one simplest example likes the follow `examples/example01/example.go`:
 
 ```go
 package main

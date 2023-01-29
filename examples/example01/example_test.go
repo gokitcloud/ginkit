@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -13,35 +14,13 @@ import (
 func TestMain(t *testing.T) {
 	go main()
 
-	waitCounter := 0
-
-	var resp *http.Response
-	var err error
-
-	for waitCounter < 10 {
-		resp, err = http.Get("http://localhost:8080/ping")
-		if err != nil {
-			waitCounter += 1
-			time.Sleep(100 * time.Millisecond)
-		} else {
-			waitCounter = 11
-		}
-	}
-
+	req, err := http.NewRequest(http.MethodGet, "http://localhost:8080/ping", nil)
 	if err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()
 	}
 
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		t.Errorf(err.Error())
-		t.FailNow()
-	}
-
-	var respObj gin.H
-
-	err = json.Unmarshal(b, &respObj)
+	respObj, err := doRequest(http.DefaultClient, req)
 	if err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()
@@ -57,4 +36,35 @@ func TestMain(t *testing.T) {
 		t.FailNow()
 	}
 
+}
+
+func doRequest(client *http.Client, req *http.Request) (respObj gin.H, err error) {
+	waitCounter := 0
+	var resp *http.Response
+	for waitCounter < 10 {
+		resp, err = client.Do(req.Clone(context.Background()))
+
+		if err != nil {
+			waitCounter += 1
+			time.Sleep(100 * time.Millisecond)
+		} else {
+			waitCounter = 11
+		}
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(b, &respObj)
+	if err != nil {
+		return nil, err
+	}
+
+	return respObj, nil
 }

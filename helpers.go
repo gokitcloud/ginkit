@@ -45,3 +45,42 @@ func parseContext(p any, c *gin.Context) any {
 
 	return paramValue
 }
+
+func wrapHanders(funcs ...any) []gin.HandlerFunc {
+	handlers := []gin.HandlerFunc{}
+
+	for _, f := range funcs {
+		switch f := f.(type) {
+		case gin.HandlersChain:
+			handlers = append(handlers, f...)
+		case gin.HandlerFunc:
+			handlers = append(handlers, f)
+		case http.HandlerFunc:
+			handlers = append(handlers, gin.WrapF(f))
+		case http.Handler:
+			handlers = append(handlers, gin.WrapH(f))
+		case func(*gin.Context) (any, error):
+			handlers = append(handlers, WrapDataFuncContext(f))
+		case func(Params) (any, error):
+			handlers = append(handlers, WrapDataFuncParams(f))
+		case func() (any, error):
+			handlers = append(handlers, WrapDataFunc(f))
+		case func() error:
+			handlers = append(handlers, WrapErrorFunc(f))
+		case string:
+			handlers = append(handlers, WrapString(f))
+		case []byte:
+			handlers = append(handlers, WrapBytes(f))
+		case gin.H:
+			handlers = append(handlers, WrapGinH(f))
+		case H:
+			handlers = append(handlers, WrapH(f))
+		case map[string]any:
+			handlers = append(handlers, WrapH(f))
+		default:
+			panic("Unknown function type")
+		}
+	}
+
+	return handlers
+}
