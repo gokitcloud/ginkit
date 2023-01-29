@@ -1,17 +1,24 @@
-[![Build Status](https://github.com/gokitcloud/ginkit/workflows/Run%20Tests/badge.svg?branch=master)](https://github.com/gokitcloud/ginkit/actions?query=branch%3Amaster)
-[![codecov](https://codecov.io/gh/gokitcloud/ginkit/branch/master/graph/badge.svg)](https://codecov.io/gh/gokitcloud/ginkit)
+# Ginkit Golang Gin Web Framework
+
+<img align="right" width="159px" src="https://raw.githubusercontent.com/gokitcloud/logo/main/web.png">
+
+[![Build Status](https://github.com/gokitcloud/ginkit/workflows/Run%20Tests/badge.svg?branch=default)](https://github.com/gokitcloud/ginkit/actions?query=branch%3Adefault)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gokitcloud/ginkit)](https://goreportcard.com/report/github.com/gokitcloud/ginkit)
 [![GoDoc](https://pkg.go.dev/badge/github.com/gokitcloud/ginkit?status.svg)](https://pkg.go.dev/github.com/gokitcloud/ginkit?tab=doc)
-[![Sourcegraph](https://sourcegraph.com/github.com/gokitcloud/ginkit/-/badge.svg)](https://sourcegraph.com/github.com/gokitcloud/ginkit?badge)
-[![Open Source Helpers](https://www.codetriage.com/gokitcloud/ginkit/badges/users.svg)](https://www.codetriage.com/gokitcloud/ginkit)
 [![Release](https://img.shields.io/github/release/gokitcloud/ginkit.svg?style=flat-square)](https://github.com/gokitcloud/ginkit/releases)
-[![TODOs](https://badgen.net/https/api.tickgit.com/badgen/github.com/gokitcloud/ginkit)](https://www.tickgit.com/browse?repo=github.com/gokitcloud/ginkit)
 
-Ginkit is a web server written in [Go](https://go.dev/) extending [Gin](https://github.com/gokitcloud/ginkit/). It maintains a Gin-like API with completed boiler plate functionality to increase your productivity. If you love Gin, you will love Ginkit.
+We love [Gin](https://github.com/gokitcloud/ginkit/)! Ginkit is written in [Go](https://go.dev/) and extends the Gin Web Framework with essential features and enhancements to make your life better! If you love Gin, you will love Ginkit.
 
 **The key features of Ginkit are:**
 
-- TBD
+- easy
+- saml auth
+- token auth
+- template and layout built in
+- reverse proxy built in
+- simple data wrappers
+- auto handling of response data
+- oauto support built in
 
 ## Getting started
 
@@ -24,7 +31,7 @@ Ginkit is a web server written in [Go](https://go.dev/) extending [Gin](https://
 With [Go module](https://github.com/golang/go/wiki/Modules) support, simply add the following import
 
 ```
-import "github.com/gocloud/ginkit"
+import "github.com/gokitcloud/ginkit"
 ```
 
 to your code, and then `go [build|run|test]` will automatically fetch the necessary dependencies.
@@ -43,13 +50,12 @@ First you need to import Gin package for using Gin, one simplest example likes t
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gokitcloud/ginkit"
 )
 
 func main() {
 	r := ginkit.Default()
-	r.GET("/ping", gin.H{
+	r.GET("/ping", ginkit.H{
 		"message": "pong",
 	})
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
