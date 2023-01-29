@@ -92,6 +92,12 @@ func WrapDataFuncContext(f func(*gin.Context) (any, error)) func(*gin.Context) {
 	}
 }
 
+func WrapH(d gin.H) func(*gin.Context) {
+	return func(c *gin.Context) {
+		ReturnData(c, http.StatusOK, d)
+	}
+}
+
 func WrapBytes(b []byte) func(*gin.Context) {
 	return func(c *gin.Context) {
 		c.Data(http.StatusOK, "text/plain", b)
@@ -140,6 +146,8 @@ func (e *Engine) wrapHanders(funcs ...any) []gin.HandlerFunc {
 			handlers = append(handlers, WrapString(f))
 		case []byte:
 			handlers = append(handlers, WrapBytes(f))
+		case gin.H:
+			handlers = append(handlers, WrapH(f))
 		default:
 			panic("Unknown function type")
 		}
