@@ -36,6 +36,7 @@ func main() {
 	restricted := e.SAMLGroup("/org/:id", samlConfig)
 	restricted.Use(ginkit.RBACMiddleware(rbacConfig))
 	restricted.Use(ginkit.RemoveHeaders("Cookie"))
+	restricted.Use(ginkit.AddRequestHeader("email", "email"))
 	restricted.GET("", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/proxy/*proxyPath", ginkit.Proxy("https://httpbin.org/"))

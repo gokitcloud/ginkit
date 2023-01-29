@@ -26,8 +26,8 @@ func main() {
 	e := ginkit.NewDefaultWithSessions("memstore", "example07", "123456578").SetVersion("0.0.0").AddHealthCheckFunc(MyInternalHealthCheck)
 
 	restricted := e.SAMLGroup("/org/:id", samlConfig)
-	restricted.Use(ginkit.SAMLtoParamsMiddleware("email"))
 	restricted.Use(ginkit.RemoveHeaders("Cookie"))
+	restricted.Use(ginkit.AddRequestHeader("email", "email"))
 	restricted.GET("", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/proxy/*proxyPath", ginkit.Proxy("https://httpbin.org/"))
