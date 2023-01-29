@@ -92,6 +92,18 @@ func WrapDataFuncContext(f func(*gin.Context) (any, error)) func(*gin.Context) {
 	}
 }
 
+func WrapBytes(b []byte) func(*gin.Context) {
+	return func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/plain", b)
+	}
+}
+
+func WrapString(s string) func(*gin.Context) {
+	return func(c *gin.Context) {
+		c.Data(http.StatusOK, "text/plain", []byte(s))
+	}
+}
+
 func (e *Engine) NoRoute(funcs ...any) {
 	handlers := e.wrapHanders(funcs...)
 
@@ -124,6 +136,10 @@ func (e *Engine) wrapHanders(funcs ...any) []gin.HandlerFunc {
 			handlers = append(handlers, WrapDataFunc(f))
 		case func() error:
 			handlers = append(handlers, WrapErrorFunc(f))
+		case string:
+			handlers = append(handlers, WrapString(f))
+		case []byte:
+			handlers = append(handlers, WrapBytes(f))
 		default:
 			panic("Unknown function type")
 		}
