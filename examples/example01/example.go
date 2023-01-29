@@ -9,7 +9,7 @@ import (
 func main() {
 	e := ginkit.NewDefault()
 
-	e.Router().GET("/test", ginkit.WrapDataFunc(test))
+	e.GET("/test", test)
 
 	err := e.Run(":3333")
 	if err != nil {

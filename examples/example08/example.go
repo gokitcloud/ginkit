@@ -7,27 +7,17 @@ import (
 	"time"
 
 	"github.com/gokitcloud/ginkit"
-	"golang.org/x/oauth2"
 )
 
 var (
-	authServerURL = "http://localhost:9096"
-	oauthConfig   = oauth2.Config{
-		ClientID:     "222222",
-		ClientSecret: "22222222",
-		Scopes:       []string{"all"},
-		RedirectURL:  "http://devlocal.site:3333/oauth2",
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  authServerURL + "/oauth/authorize",
-			TokenURL: authServerURL + "/oauth/token",
-		},
-	}
-	rbacConfig = &ginkit.RBACConfig{
-		Model:  "org_model.conf",
-		Policy: "org_policy.csv",
-		Params: []any{
-			"session:oauth_user_id", 
-			"param:id",
+	samlConfig   = &ginkit.SAMLGroupConfig{
+		MetaDataFile: "metadata.xml",
+		CertFile:     "myservice.cert",
+		KeyFile:      "myservice.key",
+		EntityID:     "asdfasdf",
+		RootURL:      "https://devlocal.site:8000",
+		ParamMap: map[string]string{
+			"email": "email",
 		},
 	}
 )
@@ -35,16 +25,15 @@ var (
 func main() {
 	e := ginkit.NewDefaultWithSessions("memstore", "example07", "123456578").SetVersion("0.0.0").AddHealthCheckFunc(MyInternalHealthCheck)
 
-	e.Router().Use(ginkit.MetricsMiddleware("test", "session:oauth_user_id", "param:id", "request:method"))
-
-	restricted := e.OAuthGroup("/org/:id", authServerURL, oauthConfig)
-	restricted.Use(ginkit.RBACMiddleware(rbacConfig))
-	restricted.Use(ginkit.RemoveHeaders("X-Token", "Cookie"))
+	restricted := e.SAMLGroup("/org/:id", samlConfig)
+	restricted.Use(ginkit.SAMLtoParamsMiddleware("email"))
+	restricted.Use(ginkit.RemoveHeaders("Cookie"))
 	restricted.GET("", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/", ginkit.WrapDataFuncParams(test2))
 	restricted.GET("/proxy/*proxyPath", ginkit.Proxy("https://httpbin.org/"))
 
-	err := e.Run(":3333")
+	// Google SAML requires SSL / TLS for your service.
+	err := e.RunSSLSelfSigned(":8000")
 	if err != nil {
 		log.Println(err)
 	}
@@ -56,10 +45,12 @@ func test() (any, error) {
 
 func test2(p ginkit.Params) (any, error) {
 	id, _ := p.Get("id")
+	email, _ := p.Get("email")
 
 	return map[string]any{
 		"foo":    "bar",
 		"orgid":  id,
+		"email":  email,
 		"params": p,
 	}, nil
 }

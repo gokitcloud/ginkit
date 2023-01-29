@@ -24,6 +24,8 @@ func Proxy(target string) func(*gin.Context) {
 		}
 
 		proxy := httputil.NewSingleHostReverseProxy(remote)
+		// TODO: Replace the transport with something configurable.  Ignore backend SSL, TTL, etc
+		// proxy.Transport = ...
 		proxy.Director = func(req *http.Request) {
 			req.Header = c.Request.Header
 			req.Host = remote.Host

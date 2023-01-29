@@ -18,9 +18,22 @@ import (
 // entityID asdfasdf
 // rootURL https://devlocal.site:8000
 // ACS URL: /saml/acs
-func (e *Engine) SAMLGroup(path string, rootURL, entityID, metadataFile, certFile, keyFile string) *gin.RouterGroup {
+// TODO: Implement SAMLGroupConfig
+type (
+	SAMLGroupConfig struct {
+		MetaDataFile string
+		MetaDataURL  string
+		CertFile     string
+		KeyFile      string
+		EntityID     string
+		RootURL      string
+		ParamMap     map[string]string
+	}
+)
+
+func (e *Engine) SAMLGroup(path string, config *SAMLGroupConfig) *gin.RouterGroup {
 	// TODO: Move to builtin Cert Store
-	keyPair, err := tls.LoadX509KeyPair(certFile, keyFile)
+	keyPair, err := tls.LoadX509KeyPair(config.CertFile, config.KeyFile)
 	if err != nil {
 		panic(err) // TODO handle error
 	}
@@ -39,7 +52,7 @@ func (e *Engine) SAMLGroup(path string, rootURL, entityID, metadataFile, certFil
 	// if err != nil {
 	// 	panic(err) // TODO handle error
 	// }
-	xmlFile, err := os.ReadFile(metadataFile)
+	xmlFile, err := os.ReadFile(config.MetaDataFile)
 	if err != nil {
 		panic(err) // TODO handle error
 	}
@@ -49,13 +62,13 @@ func (e *Engine) SAMLGroup(path string, rootURL, entityID, metadataFile, certFil
 		panic(err) // TODO handle error
 	}
 
-	rootURLParsed, err := url.Parse(rootURL)
+	rootURLParsed, err := url.Parse(config.RootURL)
 	if err != nil {
 		panic(err) // TODO handle error
 	}
 
 	samlSP, _ := samlsp.New(samlsp.Options{
-		EntityID:           entityID,
+		EntityID:           config.EntityID,
 		DefaultRedirectURI: "/",
 		URL:                *rootURLParsed,
 		AllowIDPInitiated:  true,
@@ -71,10 +84,73 @@ func (e *Engine) SAMLGroup(path string, rootURL, entityID, metadataFile, certFil
 
 	restricted := e.Router().Group(path)
 	restricted.Use(SAMLMiddleware(samlSP))
+	restricted.Use(SAMLtoParamsMapMiddleware(config.ParamMap))
 
 	return restricted
 }
 
 func SAMLMiddleware(samlSP *samlsp.Middleware) func(c *gin.Context) {
 	return adapter.Wrap(samlSP.RequireAccount)
+}
+
+func SAMLtoParamsMiddleware(params ...string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		// Range over all params which we want to add from the saml context
+		for _, param := range params {
+			// Get the saml attribute from the saml context
+			value := samlsp.AttributeFromContext(c.Request.Context(), param)
+
+			// Determine if there was already a param
+			_, exists := c.Params.Get(param)
+
+			// If the param already exists overwrite else append param
+			if exists {
+				for i, entry := range c.Params {
+					if entry.Key == param {
+						c.Params[i] = gin.Param{
+							Key:   param,
+							Value: value,
+						}
+						return
+					}
+				}
+			} else {
+				c.Params = append(c.Params, gin.Param{
+					Key:   param,
+					Value: value,
+				})
+			}
+		}
+	}
+}
+
+func SAMLtoParamsMapMiddleware(params map[string]string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		// Range over all params which we want to add from the saml context
+		for key, param := range params {
+			// Get the saml attribute from the saml context
+			value := samlsp.AttributeFromContext(c.Request.Context(), key)
+
+			// Determine if there was already a param
+			_, exists := c.Params.Get(param)
+
+			// If the param already exists overwrite else append param
+			if exists {
+				for i, entry := range c.Params {
+					if entry.Key == param {
+						c.Params[i] = gin.Param{
+							Key:   param,
+							Value: value,
+						}
+						return
+					}
+				}
+			} else {
+				c.Params = append(c.Params, gin.Param{
+					Key:   param,
+					Value: value,
+				})
+			}
+		}
+	}
 }

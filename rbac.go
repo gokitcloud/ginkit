@@ -8,6 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TODO: Implement RBACConfig
+type (
+	RBACConfig struct {
+		Model  any
+		Policy any
+		Params []any
+	}
+)
+
 func (e *Engine) RBACTokenPathGroup(path string, model, policy any, tokenHeader string) *gin.RouterGroup {
 	restricted := e.Router().Group(path)
 	restricted.Use(RBACTokenPathMiddleware(model, policy, tokenHeader))
@@ -91,15 +100,15 @@ func RBACTokenParamMiddleware(model, policy any, tokenHeader string, params []st
 	}
 }
 
-func (e *Engine) RBACGroup(path string, model, policy any, params ...any) *gin.RouterGroup {
+func (e *Engine) RBACGroup(path string, config *RBACConfig) *gin.RouterGroup {
 	restricted := e.Router().Group(path)
-	restricted.Use(RBACMiddleware(model, policy, params...))
+	restricted.Use(RBACMiddleware(config))
 
 	return restricted
 }
 
-func RBACMiddleware(model, policy any, params ...any) func(c *gin.Context) {
-	e, err := casbin.NewEnforcer(model, policy)
+func RBACMiddleware(config *RBACConfig) func(c *gin.Context) {
+	e, err := casbin.NewEnforcer(config.Model, config.Policy)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -108,7 +117,7 @@ func RBACMiddleware(model, policy any, params ...any) func(c *gin.Context) {
 		allowed := false
 		var paramValues []any
 
-		for _, p := range params {
+		for _, p := range config.Params {
 			paramValue := parseContext(p, c)
 
 			if paramValue == nil {
