@@ -2,10 +2,12 @@ package ginkit
 
 import (
 	templateHTML "html/template"
+	"net/http"
 	"os"
 	"time"
 
 	gintemplate "github.com/foolin/gin-template"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -48,4 +50,42 @@ func (e *Engine) AddTemplateFunc(k string, v interface{}) *Engine {
 	e.templateFuncMap[k] = v
 
 	return e
+}
+
+func (e *Engine) HTML(template string, f any) func(*gin.Context) {
+	return e.HTMLWithError(template, template, f)
+}
+
+func (e *Engine) HTMLWithError(template, errorTemplate string, f any) func(*gin.Context) {
+	return func(c *gin.Context) {
+		data, err := runTemplateFunc(c, f)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, errorTemplate, data)
+		} else {
+			c.HTML(http.StatusOK, template, data)
+		}
+	}
+}
+
+func runTemplateFunc(c *gin.Context, f any) (any, error) {
+	var data any
+	var err error
+
+	switch f := f.(type) {
+	case func(*gin.Context) (any, error):
+		data, err = f(c)
+	case func(*gin.Context):
+		f(c)
+	case func(Params) (any, error):
+		data, err = f(NewParams(c.Params))
+	case func() (any, error):
+		data, err = f()
+	case func() error:
+		err = f()
+	case nil:
+	default:
+		panic("Unknown function type")
+	}
+
+	return data, err
 }
