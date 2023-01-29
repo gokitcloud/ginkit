@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	samlConfig   = &ginkit.SAMLGroupConfig{
+	samlConfig = &ginkit.SAMLGroupConfig{
 		MetaDataFile: "metadata.xml",
 		CertFile:     "myservice.cert",
 		KeyFile:      "myservice.key",

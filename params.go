@@ -22,7 +22,7 @@ func NewParams(p gin.Params) Params {
 	var params Params
 	for _, v := range p {
 		params = append(params, Param{
-			Key: v.Key,
+			Key:   v.Key,
 			Value: v.Value,
 		})
 	}
