@@ -154,3 +154,17 @@ func (e *Engine) DELETE(relativePath string, f ...any) {
 func (e *Engine) OPTIONS(relativePath string, f ...any) {
 	e.Handle(http.MethodOptions, relativePath, f...)
 }
+
+func (e *Engine) Redirect(location string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Redirect(http.StatusTemporaryRedirect, location)
+	}
+}
+
+func (e *Engine) NoRouteRedirect(location string) {
+	e.Router().NoRoute(e.Redirect(location))
+}
+
+func (e *Engine) NoRouteHTML(template string, f any) {
+	e.Router().NoRoute(e.HTML(template, f))
+}
