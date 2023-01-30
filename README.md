@@ -36,7 +36,7 @@ import "github.com/gokitcloud/ginkit"
 
 to your code, and then `go [build|run|test]` will automatically fetch the necessary dependencies.
 
-Otherwise, run the following Go command to install the `gin` package:
+Otherwise, run the following Go command to install the `ginkit` package:
 
 ```sh
 $ go get -u github.com/gokitcloud/ginkit
