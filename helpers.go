@@ -53,7 +53,11 @@ func wrapHanders(funcs ...any) []gin.HandlerFunc {
 		switch f := f.(type) {
 		case gin.HandlersChain:
 			handlers = append(handlers, f...)
+		case []gin.HandlerFunc:
+			handlers = append(handlers, f...)
 		case gin.HandlerFunc:
+			handlers = append(handlers, f)
+		case func(*gin.Context):
 			handlers = append(handlers, f)
 		case http.HandlerFunc:
 			handlers = append(handlers, gin.WrapF(f))
