@@ -97,7 +97,15 @@ func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
 }
 
 func SAMLMiddleware(samlSP *samlsp.Middleware) func(c *gin.Context) {
-	return adapter.Wrap(samlSP.RequireAccount)
+	return func(c *gin.Context) {
+		Authenticated := c.GetBool("authenticated")
+
+		if Authenticated {
+			return
+		}
+
+		adapter.Wrap(samlSP.RequireAccount)(c)
+	}
 }
 
 func SAMLtoParamsMiddleware(params ...string) func(c *gin.Context) {
