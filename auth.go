@@ -34,3 +34,30 @@ func SimpleTokenAuthMiddleware(token, header string) func(c *gin.Context) {
 		}
 	}
 }
+
+func SimpleTokenAuthOptionalMiddleware(token, header string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		Authenticated := false
+		if token == "" {
+			Authenticated = true
+		}
+		for _, reqToken := range c.Request.Header[header] {
+			if reqToken == token {
+				Authenticated = true
+			}
+		}
+
+		c.Set("authenticated", Authenticated)
+	}
+}
+
+func BasicAuthMiddleware(accounts gin.Accounts) func(c *gin.Context) {
+	authMiddleware := gin.BasicAuth(accounts)
+	return func(c *gin.Context) {
+		Authenticated := c.GetBool("authenticated")
+
+		if !Authenticated {
+			authMiddleware(c)
+		}
+	}
+}

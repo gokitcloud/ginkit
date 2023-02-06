@@ -28,6 +28,7 @@ type (
 		EntityID     string
 		RootURL      string
 		ParamMap     map[string]string
+		AllowSkip    bool
 	}
 )
 
