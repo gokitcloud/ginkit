@@ -32,8 +32,8 @@ func Default() (r *Engine) {
 func NewDefault() (r *Engine) {
 	e := New()
 
-	e.Static("./web/assets")
-	e.Templates("web/views", nil)
+	// e.Static("./web/assets")
+	// e.Templates("web/views", nil)
 
 	e.Router().GET("/health", e.HealthCheckRoute)
 	e.Router().GET("/ruok", e.HealthCheckRoute)
@@ -59,8 +59,8 @@ func NewDefaultWithSessions(sessionType, name, secret string) (r *Engine) {
 
 	e.sessionsEnabled = true
 
-	e.Static("./web/assets")
-	e.Templates("web/views", nil)
+	// e.Static("./web/assets")
+	// e.Templates("web/views", nil)
 
 	e.Router().GET("/health", e.HealthCheckRoute)
 	e.Router().GET("/ruok", e.HealthCheckRoute)
