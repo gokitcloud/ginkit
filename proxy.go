@@ -28,6 +28,12 @@ func (e *Engine) NoRouteProxy(target string) {
 }
 
 func Proxy(target string) func(*gin.Context) {
+	u, err := url.Parse(target)
+	if err != nil {
+		panic(err)
+	}
+	pathPrefix := u.Path
+
 	return func(c *gin.Context) {
 		remote, err := url.Parse(target)
 		if err != nil {
@@ -42,7 +48,7 @@ func Proxy(target string) func(*gin.Context) {
 			req.Host = remote.Host
 			req.URL.Scheme = remote.Scheme
 			req.URL.Host = remote.Host
-			req.URL.Path = c.Param("proxyPath")
+			req.URL.Path = pathPrefix + c.Param("proxyPath")
 		}
 
 		proxy.ServeHTTP(c.Writer, c.Request)
