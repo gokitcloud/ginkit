@@ -124,7 +124,18 @@ func (e *Engine) NoRoute(funcs ...any) {
 
 func (e *Engine) Handle(httpMethod, relativePath string, funcs ...any) {
 	handlers := wrapHanders(funcs...)
-	e.Router().Handle(httpMethod, relativePath, handlers...)
+
+	if httpMethod == "Any" {
+		for _, method := range anyMethods {
+			e.Router().Handle(method, relativePath, handlers...)
+		}
+	} else {
+		e.Router().Handle(httpMethod, relativePath, handlers...)
+	}
+}
+
+func (e *Engine) Any(relativePath string, f ...any) {
+	e.Handle("Any", relativePath, f...)
 }
 
 func (e *Engine) GET(relativePath string, f ...any) {
@@ -157,7 +168,7 @@ func (e *Engine) OPTIONS(relativePath string, f ...any) {
 
 func (e *Engine) Redirect(location string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-			c.Redirect(http.StatusTemporaryRedirect, location)
+		c.Redirect(http.StatusTemporaryRedirect, location)
 	}
 }
 
