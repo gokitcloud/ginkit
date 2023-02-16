@@ -6,6 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var (
+	anyMethods = []string{
+		http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch,
+		http.MethodHead, http.MethodOptions, http.MethodDelete, http.MethodConnect,
+		http.MethodTrace,
+	}
+)
+
 type RouterGroup struct {
 	gin.RouterGroup
 }
@@ -31,7 +39,19 @@ func (r *RouterGroup) DELETE(relativePath string, funcs ...any) {
 func (r *RouterGroup) GET(relativePath string, funcs ...any) {
 	r.Handle(http.MethodGet, relativePath, funcs...)
 }
+
+func (r *RouterGroup) Any(relativePath string, funcs ...any) {
+	r.Handle("Any", relativePath, funcs...)
+}
+
 func (r *RouterGroup) Handle(httpMethod, relativePath string, funcs ...any) {
 	handlers := wrapHanders(funcs...)
-	r.RouterGroup.Handle(httpMethod, relativePath, handlers...)
+
+	if httpMethod == "Any" {
+		for _, method := range anyMethods {
+			r.RouterGroup.Handle(method, relativePath, handlers...)
+		}
+	} else {
+		r.RouterGroup.Handle(httpMethod, relativePath, handlers...)
+	}
 }
