@@ -61,3 +61,15 @@ func BasicAuthMiddleware(accounts gin.Accounts) func(c *gin.Context) {
 		}
 	}
 }
+
+func RequireAuthMiddleware(jwksURL, boundIssuer, jwtheader, claimid string) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		Authenticated := c.GetBool("authenticated")
+
+		if !Authenticated {
+			ReturnData(c, http.StatusForbidden, gin.H{"error": "authentication required"})
+			c.Abort()
+			return
+		}
+	}
+}
