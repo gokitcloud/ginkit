@@ -142,13 +142,13 @@ func SAMLtoParamsMiddleware(params ...string) func(c *gin.Context) {
 func SAMLtoParamsMapMiddleware(params map[string]string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		// Range over all params which we want to add from the saml context
-		for key, param := range params {
+		for param, key := range params {
 			// Get the saml attribute from the saml context
 			value := samlsp.AttributeFromContext(c.Request.Context(), key)
 
 			// Determine if there was already a param
 			_, exists := c.Params.Get(param)
-
+			
 			// If the param already exists overwrite else append param
 			if exists {
 				for i, entry := range c.Params {

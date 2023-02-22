@@ -75,7 +75,9 @@ func New() *Engine {
 	r.Use(gin.Recovery())
 	r.Use(location.Default())
 	r.Use(requestid.New())
-	r.Use(gzip.Gzip(gzip.DefaultCompression))
+	if false {
+		r.Use(gzip.Gzip(gzip.DefaultCompression))
+	}
 
 	// Use default logger
 	r.Use(gin.Logger())
