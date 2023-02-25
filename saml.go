@@ -44,7 +44,7 @@ func (e *Engine) SAMLGroup(path string, config *SAMLGroupConfig) *gin.RouterGrou
 	return restricted
 }
 
-func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
+func (e *Engine) SAMLSetup(config *SAMLGroupConfig) *samlsp.Middleware {
 	// TODO: Move to builtin Cert Store
 	keyPair, err := tls.LoadX509KeyPair(config.CertFile, config.KeyFile)
 	if err != nil {
@@ -83,7 +83,7 @@ func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
 		panic(err) // TODO handle error
 	}
 
-	samlSP, _ := samlsp.New(samlsp.Options{
+	samlSP, err := samlsp.New(samlsp.Options{
 		EntityID:           config.EntityID,
 		DefaultRedirectURI: "/",
 		URL:                *rootURLParsed,
@@ -92,7 +92,16 @@ func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
 		Certificate:        keyPair.Leaf,
 		IDPMetadata:        idpMetadata,
 	})
+	if err != nil {
+		panic(err) // TODO handle error
+	}
 
+	return samlSP
+}
+
+func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
+	samlSP := e.SAMLSetup(config)
+	
 	// TODO Does this need to be any?
 	// TODO make /saml path configurable
 	// e.Router().Any("/saml/*action", gin.WrapH(samlSP))
