@@ -1,12 +1,15 @@
 package ginkit
 
 import (
+	"context"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
+	"net/http"
 	"net/url"
 	"os"
 
+	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 	"github.com/gin-gonic/gin"
 	adapter "github.com/gwatts/gin-adapter"
@@ -52,24 +55,27 @@ func (e *Engine) SAMLInit(config *SAMLGroupConfig) *samlsp.Middleware {
 		panic(err) // TODO handle error
 	}
 
+	var idpMetadata *saml.EntityDescriptor
 	// TODO - Support URL
-	// idpMetadataURL, err := url.Parse("https://accounts.google.com/o/saml2/idp...")
-	// if err != nil {
-	// 	panic(err) // TODO handle error
-	// }
-	// idpMetadata, err := samlsp.FetchMetadata(context.Background(), http.DefaultClient,
-	// 	*idpMetadataURL)
-	// if err != nil {
-	// 	panic(err) // TODO handle error
-	// }
-	xmlFile, err := os.ReadFile(config.MetaDataFile)
-	if err != nil {
-		panic(err) // TODO handle error
-	}
+	if config.MetaDataURL != "" {
+		idpMetadataURL, err := url.Parse(config.MetaDataURL)
+		if err != nil {
+			panic(err) // TODO handle error
+		}
+		idpMetadata, err = samlsp.FetchMetadata(context.Background(), http.DefaultClient, *idpMetadataURL)
+		if err != nil {
+			panic(err) // TODO handle error
+		}
+	} else {
+		xmlFile, err := os.ReadFile(config.MetaDataFile)
+		if err != nil {
+			panic(err) // TODO handle error
+		}
+		idpMetadata, err = samlsp.ParseMetadata(xmlFile)
+		if err != nil {
+			panic(err) // TODO handle error
+		}
 
-	idpMetadata, err := samlsp.ParseMetadata(xmlFile)
-	if err != nil {
-		panic(err) // TODO handle error
 	}
 
 	rootURLParsed, err := url.Parse(config.RootURL)
@@ -148,7 +154,7 @@ func SAMLtoParamsMapMiddleware(params map[string]string) func(c *gin.Context) {
 
 			// Determine if there was already a param
 			_, exists := c.Params.Get(param)
-			
+
 			// If the param already exists overwrite else append param
 			if exists {
 				for i, entry := range c.Params {
