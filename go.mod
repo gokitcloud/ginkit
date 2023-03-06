@@ -15,7 +15,7 @@ require (
 	github.com/gwatts/gin-adapter v1.0.0
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/pkg/errors v0.9.1
-	golang.org/x/oauth2 v0.4.0
+	golang.org/x/oauth2 v0.6.0
 )
 
 require (
@@ -51,9 +51,9 @@ require (
 	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/net v0.5.0 // indirect
-	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
