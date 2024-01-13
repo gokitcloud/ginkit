@@ -29,6 +29,17 @@ func (e *Engine) OAuthGroup(path string, authServerURL string, config oauth2.Con
 	return authorized
 }
 
+func (e *Engine) OAuthMW(path string, authServerURL string, config oauth2.Config) gin.HandlerFunc {
+	if !e.sessionsEnabled {
+		log.Fatal("Must enable sessions.")
+	}
+	noauth := e.Router().Group("/")
+	noauth.GET("/oauth2", oauthEndpoint(config))
+	noauth.GET("/logout", LogoutRoute)
+
+	return oauthMiddleware(authServerURL, config)
+}
+
 func genCodeChallengeS256(s string) string {
 	s256 := sha256.Sum256([]byte(s))
 	return base64.URLEncoding.EncodeToString(s256[:])
