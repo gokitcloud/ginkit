@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/casbin/casbin/v2 v2.61.0
-	github.com/crewjam/saml v0.4.12
+	github.com/crewjam/saml v0.4.13
 	github.com/foolin/gin-template v0.0.0-20190415034731-41efedfb393b
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/gzip v0.0.6
