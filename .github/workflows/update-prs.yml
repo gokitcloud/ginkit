@@ -18,13 +18,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr list --repo ${github.repository} --state open --json number --jq '.[].number' > pr_numbers.txt
+          gh pr list --repo ${{github.repository}} --state open --json number --jq '.[].number' > pr_numbers.txt
 
       - name: Rebase each pull request
         run: |
           while read pr_number; do
             echo "Rebasing PR #$pr_number"
-            gh pr checkout $pr_number --repo ${github.repository} 
+            gh pr checkout $pr_number --repo ${{github.repository}} 
             git rebase main
             git push --force-with-lease
           done < pr_numbers.txt
