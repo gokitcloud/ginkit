@@ -117,7 +117,6 @@ jobs:
           echo "New tag: $NEW_TAG"
 
           git tag $NEW_TAG
-          git push origin $NEW_TAG
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
