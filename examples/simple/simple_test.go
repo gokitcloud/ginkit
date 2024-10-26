@@ -15,7 +15,7 @@ import (
 
 func TestMain(t *testing.T) {
 	port := ":8081"
-	os.Setenv("PORT", port)
+	os.Setenv("S_PORT", port)
 	go main()
 
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost%s/ping", port), nil)

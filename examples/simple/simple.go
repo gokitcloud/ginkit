@@ -9,14 +9,15 @@ import (
 
 func main() {
 	r := ginkit.Default()
+
 	r.GET("/ping", gin.H{
 		"message": "pong",
 	})
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("S_PORT")
 	if port == "" {
-		port = "8080"
+		port = ":8080"
 	}
 
-	r.Run(os.Getenv(port))
+	r.Run(port)
 }

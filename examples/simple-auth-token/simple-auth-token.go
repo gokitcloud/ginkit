@@ -26,9 +26,9 @@ func main() {
 		return nil, errors.New("invalid ping")
 	})
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("SA_PORT")
 	if port == "" {
-		port = "8080"
+		port = ":8080"
 	}
 
 	r.Run(port)

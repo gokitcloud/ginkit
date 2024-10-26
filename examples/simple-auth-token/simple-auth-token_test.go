@@ -16,7 +16,7 @@ import (
 var port = ":8082"
 
 func init() {
-	os.Setenv("PORT", port)
+	os.Setenv("SA_PORT", port)
 	go main()
 
 }
