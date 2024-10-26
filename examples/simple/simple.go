@@ -12,5 +12,11 @@ func main() {
 	r.GET("/ping", gin.H{
 		"message": "pong",
 	})
-	r.Run(os.Getenv("PORT"))
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	r.Run(os.Getenv(port))
 }
