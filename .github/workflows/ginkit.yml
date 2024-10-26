@@ -71,11 +71,6 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        example: 
-          - example01
-          - example02
-          - example03
-          - example04
         os: [ubuntu-latest, macos-latest]
         go: [1.18, 1.21]
         include:
@@ -109,10 +104,16 @@ jobs:
             ${{ runner.os }}-go-
 
       - name: Run Examples
-        working-directory: examples/${{ matrix.example }}
         run: |
-          go mod download
-          go test .
+
+          example_dirs=$(find . -type f -name "example_test.go" -exec dirname {} \; | sort -u)
+
+          # Iterate over each directory and run go test
+          for dir in $example_dirs; do
+            echo "Running tests in $dir"
+            (cd $dir && go mod download && go test .)
+          done
+
   tests-pass:
     needs: [test, examples, lint]
     runs-on: ubuntu-latest
