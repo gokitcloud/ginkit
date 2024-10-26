@@ -20,10 +20,9 @@ jobs:
 
       - name: Rebase each pull request
         run: |
-
           while read pr_number; do
             echo "Rebasing PR #$pr_number"
             gh pr checkout $pr_number --repo ${{github.repository}} 
-            git rebase main
+            git pull origin main --rebase
             git push --force-with-lease
           done <<< `gh pr list --repo ${{github.repository}} --state open --json number --jq '.[].number'`
