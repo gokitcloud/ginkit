@@ -19,6 +19,8 @@ jobs:
         id: fetch-prs
         run: |
           gh pr list --repo ${{github.repository}} --state open --json number --jq '.[].number' > pr_numbers.txt
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Rebase each pull request
         run: |
