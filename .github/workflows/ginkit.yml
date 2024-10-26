@@ -106,6 +106,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          git fetch --tags
           TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
           TAG=${TAG#v}  # Remove the 'v' prefix if it exists
           echo "Current tag: $TAG"
