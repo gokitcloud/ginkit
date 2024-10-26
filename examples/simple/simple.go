@@ -1,13 +1,16 @@
 package main
 
 import (
+	"os"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gokitcloud/ginkit"
 )
 
 func main() {
 	r := ginkit.Default()
-	r.GET("/ping", ginkit.H{
+	r.GET("/ping", gin.H{
 		"message": "pong",
 	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	r.Run(os.Getenv("PORT"))
 }

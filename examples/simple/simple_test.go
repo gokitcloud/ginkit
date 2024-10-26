@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -12,9 +14,11 @@ import (
 )
 
 func TestMain(t *testing.T) {
+	port := ":8081"
+	os.Setenv("PORT", port)
 	go main()
 
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:8080/ping", nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost%s/ping", port), nil)
 	if err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()

@@ -3,27 +3,32 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
+var port = ":8081"
+
 func init() {
+	os.Setenv("PORT", port)
 	go main()
+
 }
+func TestOK(t *testing.T) {
 
-func TestIsOK(t *testing.T) {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost%s/ping", port), nil)
+	req.Header.Set("X-token", "12345678")
 
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:8080/ping", nil)
 	if err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()
 	}
-
-	req.Header.Set("X-token", "12345678")
 
 	respObj, res, err := doRequest(http.DefaultClient, req)
 	if err != nil {
@@ -45,12 +50,42 @@ func TestIsOK(t *testing.T) {
 		t.Errorf("missing message")
 		t.FailNow()
 	}
+}
+func TestAOK(t *testing.T) {
 
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost%s/a/ping", port), nil)
+	req.Header.Set("X-token", "12345678")
+
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+
+	respObj, res, err := doRequest(http.DefaultClient, req)
+	if err != nil {
+		t.Errorf(err.Error())
+		t.FailNow()
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("status code should be %d, but is %d", http.StatusOK, res.StatusCode)
+		t.FailNow()
+	}
+
+	if msg, ok := respObj["message"]; ok {
+		if msg != "pong" {
+			t.Errorf("message should be pong, but is %s", msg)
+			t.FailNow()
+		}
+	} else {
+		t.Errorf("missing message")
+		t.FailNow()
+	}
 }
 
-func TestUnauth(t *testing.T) {
+func TestForbidden(t *testing.T) {
 
-	req, err := http.NewRequest(http.MethodGet, "http://localhost:8080/ping", nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost%s/ping", port), nil)
 	if err != nil {
 		t.Errorf(err.Error())
 		t.FailNow()
@@ -66,7 +101,9 @@ func TestUnauth(t *testing.T) {
 		t.Errorf("status code should be %d, but is %d", http.StatusForbidden, res.StatusCode)
 		t.FailNow()
 	}
+
 }
+
 func doRequest(client *http.Client, req *http.Request) (respObj gin.H, res *http.Response, err error) {
 	waitCounter := 0
 	for waitCounter < 10 {
