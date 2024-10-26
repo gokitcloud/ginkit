@@ -10,7 +10,9 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
+  
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -78,10 +80,6 @@ jobs:
     needs: [test] # After the E2E and build jobs, if one of them fails, it won't merge the PR.
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login == 'dependabot[bot]'}} # Detect that the PR author is dependabot
-    permissions:
-      contents: write
-      pull-requests: write
-      repository-projects: write    
     steps:
       - name: Enable auto-merge for Dependabot PRs
         run: gh pr merge --repo ${{ github.repository }}  --auto --merge "$PR_URL" # Use Github CLI to merge automatically the PR
