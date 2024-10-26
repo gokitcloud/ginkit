@@ -15,18 +15,15 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Fetch all pull requests
-        id: fetch-prs
-        run: |
-          gh pr list --repo ${{github.repository}} --state open --json number --jq '.[].number' > pr_numbers.txt
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Rebase each pull request
         run: |
+
           while read pr_number; do
             echo "Rebasing PR #$pr_number"
             gh pr checkout $pr_number --repo ${{github.repository}} 
             git rebase main
             git push --force-with-lease
-          done < pr_numbers.txt
+          done <<< `gh pr list --repo ${{github.repository}} --state open --json number --jq '.[].number'`
