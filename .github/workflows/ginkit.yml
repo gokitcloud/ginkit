@@ -113,6 +113,12 @@ jobs:
         run: |
           go mod download
           go test .
+  tests-pass:
+    needs: [test, examples, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: tests-pass
+        run: echo "Tests pass!"
   dependabot:
     name: 'Dependabot'
     needs: [examples, test] # After the E2E and build jobs, if one of them fails, it won't merge the PR.
