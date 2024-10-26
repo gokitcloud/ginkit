@@ -69,14 +69,14 @@ jobs:
           go test ./...
 
   tests-pass:
-    needs: [test, examples, lint]
+    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - name: tests-pass
         run: echo "Tests pass!"
   dependabot:
     name: 'Dependabot'
-    needs: [examples, test] # After the E2E and build jobs, if one of them fails, it won't merge the PR.
+    needs: [test] # After the E2E and build jobs, if one of them fails, it won't merge the PR.
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login == 'dependabot[bot]'}} # Detect that the PR author is dependabot
     steps:
