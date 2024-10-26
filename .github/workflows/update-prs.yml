@@ -21,6 +21,9 @@ jobs:
       - name: Rebase each pull request
         run: |
           while read pr_number; do
+            if [ -z "$pr_number" ]; then
+              break
+            fi
             echo "Rebasing PR #$pr_number"
             gh pr checkout $pr_number --repo ${{github.repository}} 
             git pull origin main --rebase
