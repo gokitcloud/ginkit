@@ -1,5 +1,5 @@
 project_name: ginkit
-
+version: 2
 builds:
   -
     # If true, skip the build.
