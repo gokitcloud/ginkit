@@ -13,7 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var port = ":8081"
+var port = ":8082"
 
 func init() {
 	os.Setenv("PORT", port)
