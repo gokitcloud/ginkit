@@ -75,9 +75,10 @@ jobs:
     steps:
       - name: tests-pass
         run: echo "Tests pass!"
+
   dependabot:
     name: 'Dependabot'
-    needs: [test] # After the E2E and build jobs, if one of them fails, it won't merge the PR.
+    needs: [tests-pass] # After the E2E and build jobs, if one of them fails, it won't merge the PR.
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.user.login == 'dependabot[bot]'}} # Detect that the PR author is dependabot
     steps:
@@ -86,3 +87,33 @@ jobs:
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  release:
+    needs: [tests-pass]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Get current tag
+        id: get_tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          TAG=${TAG#v}  # Remove the 'v' prefix if it exists
+          echo "Current tag: $TAG"
+
+          IFS='.' read -r -a TAG_PARTS <<< "$TAG"
+          NEW_TAG="${TAG_PARTS[0]}.$((${TAG_PARTS[1]} + 1)).0"
+          NEW_TAG="v$NEW_TAG"
+          echo "New tag: $NEW_TAG"
+
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
