@@ -1,9 +1,9 @@
 package ginkit
 
 import (
+	"io"
 	"net/http"
 	"strings"
-	"io/ioutil"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -28,11 +28,11 @@ func parseContext(p any, c *gin.Context) any {
 			case "path":
 				paramValue = c.Request.URL.Path
 			case "body":
-				body, err := ioutil.ReadAll(c.Request.Body)
+				body, err := io.ReadAll(c.Request.Body)
 				if err != nil {
 					break
 				} else {
-					paramValue = body					
+					paramValue = body
 				}
 			}
 		case "value":
