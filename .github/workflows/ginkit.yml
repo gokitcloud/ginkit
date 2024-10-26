@@ -3,10 +3,10 @@ name: Run Tests
 on:
   push:
     branches:
-      - default
+      - main
   pull_request:
     branches:
-      - default
+      - main
 
 permissions:
   contents: read
