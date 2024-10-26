@@ -1,0 +1,31 @@
+name: Update PRs
+
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update-prs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Fetch all pull requests
+        id: fetch-prs
+        run: |
+          gh pr list --state open --json number --jq '.[].number' > pr_numbers.txt
+
+      - name: Rebase each pull request
+        run: |
+          while read pr_number; do
+            echo "Rebasing PR #$pr_number"
+            gh pr checkout $pr_number
+            git rebase main
+            git push --force-with-lease
+          done < pr_numbers.txt
