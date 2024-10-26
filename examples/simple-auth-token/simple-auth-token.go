@@ -16,8 +16,8 @@ func main() {
 	})
 
 	restrictedA := r.SimpleTokenAuthGroup("/a", "12345678", "X-Token")
-	restrictedA.GET("/:ping", func(p ginkit.Params) (any, error) {
-		if ping, ok := p.Get("ping"); ok && ping == "ping" {
+	restrictedA.GET("/:path", func(p ginkit.Params) (any, error) {
+		if ping, ok := p.Get("path"); ok && ping == "ping" {
 			return ginkit.H{
 				"message": "pong",
 			}, nil
