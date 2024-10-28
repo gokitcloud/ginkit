@@ -10,7 +10,7 @@ require (
 	github.com/gin-contrib/gzip v1.0.1
 	github.com/gin-contrib/location v1.0.1
 	github.com/gin-contrib/requestid v0.0.6
-	github.com/gin-contrib/sessions v0.0.5
+	github.com/gin-contrib/sessions v1.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gwatts/gin-adapter v1.0.0
 	github.com/lestrrat-go/jwx v1.2.25
@@ -35,9 +35,9 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/context v1.1.1 // indirect
-	github.com/gorilla/securecookie v1.1.1 // indirect
-	github.com/gorilla/sessions v1.2.1 // indirect
+	github.com/gorilla/context v1.1.2 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/gorilla/sessions v1.2.2 // indirect
 	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
