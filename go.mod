@@ -6,7 +6,7 @@ require (
 	github.com/casbin/casbin/v2 v2.61.0
 	github.com/crewjam/saml v0.4.13
 	github.com/foolin/gin-template v0.0.0-20190415034731-41efedfb393b
-	github.com/gin-contrib/cors v1.4.0
+	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-contrib/gzip v1.0.1
 	github.com/gin-contrib/location v1.0.1
 	github.com/gin-contrib/requestid v0.0.6
